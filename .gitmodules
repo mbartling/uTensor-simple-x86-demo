@@ -1,0 +1,4 @@
+[submodule "uTensor"]
+	path = uTensor
+	url = https://github.com/uTensor/uTensor.git
+	branch = proposal/rearch
