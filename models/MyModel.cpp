@@ -1,13 +1,11 @@
 #include "MyModel.h"
 
-MyModel::MyModel()
+MyModel::MyModel() : meta_allocator(), ram_allocator(), conv_Aw({1,1,1,1}, SAME)
 {
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   
-  b = new RomTensor({2, 2}, u8, s_b);
-  c = new RomTensor({2,2}, u8, s_c);
-  d = new RomTensor({2,2}, u8, s_d);
+ w = new RomTensor({ 5,5,1,32 }, flt, s_w_0_stride_1);
 
 }
 
@@ -17,33 +15,10 @@ void MyModel::compute() {
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
   
-  // Ram Tensors are temporary values
-  // Can probably come up with some form of a naming scheme around this
-  Tensor mult_1_out = new RamTensor({2,2}, u8);
-  Tensor add_1_out = new RamTensor({2,2}, u8);
 
-  // First Multiply
-  // mult_1_out = input*b;
-  mult
-      .set_inputs({{MatrixMultOperator<uint8_t>::a, *inputs[input].tensor}, {MatrixMultOperator<uint8_t>::b, b}})
-      .set_outputs({{MatrixMultOperator<uint8_t>::c, mult_1_out}})
-      .eval();
-  
-  // First Add
-  // output = mult_1_out + c;
-  add
-      .set_inputs({{AddOperator<uint8_t>::a, mult_1_out}, {AddOperator<uint8_t>::b, c}})
-      .set_outputs({{AddOperator<uint8_t>::c, add_1_out}})
-      .eval();
-  
-  mult_1_out.free();
+  conv_Aw
+       .set_inputs({ {ConvOperator<float>::in, *inputs[input].tensor}, {ConvOperator<float>::filter, w} })
+       .set_outputs({ {ConvOperator<float>::out, *outputs[output].tensor} })
+       .eval();
 
-
-  // Second Add
-  // output = add_1_out + d
-  add
-      .set_inputs({{AddOperator<uint8_t>::a, add_1_out}, {AddOperator<uint8_t>::b, d}})
-      .set_outputs({{AddOperator<uint8_t>::c, *outputs[output].tensor}})
-      .eval();
-  add_1_out.free();
 }

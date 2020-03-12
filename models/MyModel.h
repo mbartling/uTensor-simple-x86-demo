@@ -25,19 +25,17 @@ class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs>
     virtual void compute();
 
   private:
+    // Memory Allocators must come first
+    localCircularArenaAllocator<1024> meta_allocator;
+    localCircularArenaAllocator<25088*sizeof(float) + 512, uint32_t> ram_allocator;
+
     // ROM Tensors
-    Tensor b;
-    Tensor c;
-    Tensor d;
+    Tensor w;
 
     // Operators
     // Note: only need one instance of each since we can set inputs in the compute call
-    MatrixMultOperator<uint8_t> mult;
-    AddOperator<uint8_t> add;
+    ConvOperator<float> conv_Aw;
 
-    // Memory Allocators
-    localCircularArenaAllocator<512> meta_allocator;
-    localCircularArenaAllocator<64> ram_allocator;
 };
 
 
