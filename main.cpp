@@ -1,13 +1,14 @@
-#include "mbed.h"
+//#include "mbed.h"
 #include <cstring>
 #include <cstdio>
+#include <cmath>
 
 #include "MyModel.h"
 
 using namespace uTensor;
 
 MyModel myModel;
-Timer t;
+//Timer t;
 
 int main() {
   //MyModel* model = new MyModel();
@@ -20,19 +21,19 @@ int main() {
   // Simulate data write
   
   printf("Evaluating model using provided buffer\n");
-  t.start();
+  //t.start();
   myModel
       .set_inputs({{MyModel::input, in}})
       .set_outputs({{MyModel::output, out}})
       .eval();
-  t.stop();
-  printf("Eval took %d uS\n", t.read_us());
+//  t.stop();
+//  printf("Eval took %d uS\n", t.read_us());
 
   // Compare results using buffers
   for(int i = 0; i < 1*28*28*32; i++){
     float tmp = out(i);
-    if(tmp != s_ref_out_0_stride_1[i]){
-      printf("Oh crap, values are different!\n");
+    if(fabs(tmp - s_ref_out_0_stride_1[i]) > 0.0001){
+      printf("Oh crap, values are different! %f %f\n", tmp, s_ref_out_0_stride_1[i]);
       return -1;
     }
   }
