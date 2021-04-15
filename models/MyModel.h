@@ -5,6 +5,8 @@
 #include "constants.h"
 
 using namespace uTensor;
+using uTensor::ReferenceOperators::MatrixMultOperator;
+using uTensor::ReferenceOperators::AddOperator;
 
 const size_t my_model_num_inputs = 1;
 const size_t my_model_num_outputs = 1;
