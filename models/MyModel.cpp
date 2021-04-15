@@ -1,5 +1,8 @@
 #include "MyModel.h"
 
+DEFINE_EVENT(MyModelEvalStartEvent);
+DEFINE_EVENT(MyModelEvalEndEvent);
+
 MyModel::MyModel()
 {
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
@@ -13,6 +16,7 @@ MyModel::MyModel()
 
 // The two rom Tensors will be freed after eval is called
 void MyModel::compute() {
+  Context::get_default_context()->notifyEvent(MyModelEvalStartEvent());
   // First update the default context to this model in case multiple models are being run
   Context::get_default_context()->set_metadata_allocator(&meta_allocator);
   Context::get_default_context()->set_ram_data_allocator(&ram_allocator);
@@ -46,4 +50,5 @@ void MyModel::compute() {
       .set_outputs({{AddOperator<uint8_t>::c, outputs[output].tensor()}})
       .eval();
   add_1_out.free();
+  Context::get_default_context()->notifyEvent(MyModelEvalEndEvent());
 }

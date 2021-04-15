@@ -11,6 +11,8 @@ using uTensor::ReferenceOperators::AddOperator;
 const size_t my_model_num_inputs = 1;
 const size_t my_model_num_outputs = 1;
 
+DECLARE_EVENT(MyModelEvalStartEvent);
+DECLARE_EVENT(MyModelEvalEndEvent);
 // This example Model allocates all RAM tensors on each eval and deletes them as needed
 // out = a*b + c + d
 class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs> {
@@ -26,20 +28,23 @@ class MyModel : public ModelInterface<my_model_num_inputs, my_model_num_outputs>
   protected:
     virtual void compute();
 
-  private:
+  // Normally private
+  //private:
+  public:
     // ROM Tensors
     Tensor b;
     Tensor c;
     Tensor d;
 
+  private:
     // Operators
     // Note: only need one instance of each since we can set inputs in the compute call
     MatrixMultOperator<uint8_t> mult;
     AddOperator<uint8_t> add;
 
     // Memory Allocators
-    localCircularArenaAllocator<512> meta_allocator;
-    localCircularArenaAllocator<64> ram_allocator;
+    localCircularArenaAllocator<512, uint16_t> meta_allocator;
+    localCircularArenaAllocator<64, uint16_t> ram_allocator;
 };
 
 
