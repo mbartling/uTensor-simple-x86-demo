@@ -41,3 +41,19 @@ New additional key ideas:
   - GDB debugging IS NOW TRIVIAL
 
  Ultimately, these additions help decouple the data sciency parts from the embedded engineery bits, so both parties can iterate quickly and reliably in their dev cycles. 
+
+## Building
+
+```
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_PRINTING=1 ..
+make
+./demo
+```
+
+I intentionally injected a lifecycle management bug into this demo which causes a specific Tensor to be destroyed in the wrong order at program exit. Can you find it? :)
+Hint, backtrace and `findEvent.py`. 
+
+```
+python ./findEvent.py EVENT_CODE
+```
